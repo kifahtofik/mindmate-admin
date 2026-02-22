@@ -18,7 +18,7 @@ export function ContentManagement() {
     { id: 3, title: 'Mindful Morning', type: 'article', category: 'Routine', status: 'Published', views: 850, rating: 4.5, triggers: ['morning', 'sad', 'lazy'] },
     { id: 4, title: 'CBT for Negative Thoughts', type: 'article', category: 'Therapy', status: 'Published', views: 2100, rating: 4.9, triggers: ['negative', 'failure', 'sad'] },
   ]);
-
+ 
   const filteredData = resources.filter(item => {
     if (tabValue === 0) return true;
     const types = ['all', 'article', 'exercise', 'video'];
