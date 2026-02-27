@@ -23,13 +23,7 @@ export function Login({ onLogin }) {
         border: '1px solid #e2e8f0', textAlign: 'center',
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
       }}>
-        <Box sx={{ 
-          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 
-          p: 1.5, borderRadius: '16px', display: 'inline-flex', mb: 3 
-        }}>
-          <Shield color="white" size={32} />
-        </Box>
-        
+  
         <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: '#1e293b' }}>
           MindMate Admin
         </Typography>

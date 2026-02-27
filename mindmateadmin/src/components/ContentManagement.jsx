@@ -1,152 +1,133 @@
 import React, { useState } from "react";
 import {
   Box,
-  Typography,
   Button,
-  Card,
-  Tabs,
-  Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   TextField,
+  Typography,
+  Card,
   MenuItem,
-  Stack,
   Alert,
+  CircularProgress
 } from "@mui/material";
-import { Plus, CloudUpload } from "lucide-react";
+import axios from "axios";
+
+const VIDEO_API = "http://localhost:3000/video/upload";
+const AUDIO_API = "http://localhost:3000/audio/upload";
 
 export function ContentManagement() {
-  const [tabValue, setTabValue] = useState(0);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    type: "video",
-    category: "Anxiety",
-  });
-
+  const [type, setType] = useState("video");
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const handleSubmit = async () => {
-    setError("");
-    setSuccess("");
-
-    if (!file || !form.title) {
-      setError("Title and media file are required");
-      return;
+  const handleUpload = async () => {
+    if (!file || !title) {
+      return setMessage({ type: "error", text: "File and title are required" });
     }
 
-    const payload = new FormData();
-    payload.append("video", file); 
-    payload.append("title", form.title);
-    payload.append("description", form.description);
+    const formData = new FormData();
+    formData.append(type, file); // 🔥 MUST match multer field name
+    formData.append("title", title);
+    formData.append("description", description);
+
+    const url = type === "video" ? VIDEO_API : AUDIO_API;
 
     try {
       setLoading(true);
-       res = await fetch("http://localhost:3000/video/upload", {
-        method: "POST",
-        body: payload,
+      setMessage(null);
+
+      await axios.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 600000, 
       });
 
-      if (!res.ok) throw new Error("Upload failed");
-
-      setSuccess("Media uploaded successfully 🎉");
-      setForm({ title: "", description: "", type: "video", category: "Anxiety" });
+      setMessage({ type: "success", text: `${type} uploaded successfully` });
       setFile(null);
+      setTitle("");
+      setDescription("");
     } catch (err) {
-      setError("Failed to upload media");
+      console.error(err);
+      setMessage({ type: "error", text: "Upload failed" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ p: 4, bgcolor: "#f4f6f8", minHeight: "100vh" }}>
-      {/* HEADER */}
-      <Stack direction="row" justifyContent="space-between" mb={4}>
-        <Typography variant="h4" fontWeight={900}>
-          Mind Mate Admin
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 5 }}>
+      <Card sx={{ p: 4, borderRadius: 3 }}>
+        <Typography variant="h5" fontWeight={700} mb={2}>
+          Upload Media
         </Typography>
+
+        {message && (
+          <Alert severity={message.type} sx={{ mb: 2 }}>
+            {message.text}
+          </Alert>
+        )}
+
+        {/* Media Type */}
+        <TextField
+          select
+          label="Media Type"
+          fullWidth
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          <MenuItem value="video">Video</MenuItem>
+          <MenuItem value="audio">Audio</MenuItem>
+        </TextField>
+
+        {/* Title */}
+        <TextField
+          label="Title"
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+
+        {/* Description */}
+        <TextField
+          label="Description"
+          fullWidth
+          multiline
+          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+
+        {/* File Input */}
+        <Button variant="outlined" component="label" fullWidth sx={{ mb: 2 }}>
+          Select {type}
+          <input
+            hidden
+            type="file"
+            accept={type === "video" ? "video/*" : "audio/*"}
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </Button>
+
+        {file && (
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Selected: {file.name}
+          </Typography>
+        )}
+
+        {/* Upload */}
         <Button
           variant="contained"
-          startIcon={<Plus size={20} />}
-          onClick={() => setIsDialogOpen(true)}
+          fullWidth
+          onClick={handleUpload}
+          disabled={loading}
         >
-          Upload Content
+          {loading ? <CircularProgress size={24} /> : "Upload"}
         </Button>
-      </Stack>
-
-      <Card>
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-          <Tab label="Videos" />
-          <Tab label="Audio" />
-        </Tabs>
       </Card>
-
-      {/* DIALOG */}
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Upload Media</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} mt={1}>
-            {error && <Alert severity="error">{error}</Alert>}
-            {success && <Alert severity="success">{success}</Alert>}
-
-            <TextField
-              label="Title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              fullWidth
-            />
-
-            <TextField
-              label="Description"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              multiline
-              rows={3}
-              fullWidth
-            />
-
-            <TextField
-              select
-              label="Category"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
-              <MenuItem value="Anxiety">Anxiety</MenuItem>
-              <MenuItem value="Depression">Depression</MenuItem>
-              <MenuItem value="Wellness">Wellness</MenuItem>
-            </TextField>
-
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<CloudUpload />}
-            >
-              {file ? file.name : "Select Video / Audio"}
-              <input
-                type="file"
-                hidden
-                accept="video/*,audio/*"
-                onChange={(e) => setFile(e.target.files[0])}
-              />
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? "Uploading..." : "Upload"}
-            </Button>
-          </Stack>
-        </DialogContent>
-      </Dialog>
     </Box>
   );
 }

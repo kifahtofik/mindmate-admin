@@ -37,7 +37,8 @@ export function UserManagement() {
 
   const filteredUsers = users.filter(user => {
     const userName = user.name || "";
-    return userName.toLowerCase().includes(searchTerm.toLowerCase());
+    const userEmail = user.email || "";
+    return userName.toLowerCase().includes(searchTerm.toLowerCase()) || userEmail.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   return (
@@ -46,13 +47,6 @@ export function UserManagement() {
       <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>
         User Management
       </Typography>
-
-      <Alert
-        icon={<Shield size={18} />}
-        sx={{ mb: 4, borderRadius: 2, bgcolor: "#eff6ff" }}
-      >
-        Mobile application users overview (read-only).
-      </Alert>
 
       {/* Search */}
       <Card sx={{ mb: 3, p: 2, borderRadius: 3 }}>
@@ -77,6 +71,7 @@ export function UserManagement() {
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: 700 }}>Username</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Signup Date</TableCell>
             </TableRow>
           </TableHead>
@@ -97,10 +92,10 @@ export function UserManagement() {
                     {user.name || "N/A"}
                   </TableCell>
                   <TableCell>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                    {user.email || "N/A"}
                   </TableCell>
                   <TableCell>
-                   
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                   </TableCell>
                 </TableRow>
               ))
@@ -125,6 +120,7 @@ export function UserManagement() {
             <DialogTitle>User Details</DialogTitle>
             <DialogContent dividers>
               <Typography><strong>Username:</strong> {selectedUser.name}</Typography>
+              <Typography><strong>Email:</strong> {selectedUser.email}</Typography>
               <Typography sx={{ mt: 1 }}>
                 <strong>Signup Date:</strong>{" "}
                 {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleString() : "N/A"}

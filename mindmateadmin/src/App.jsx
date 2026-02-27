@@ -12,7 +12,7 @@ import {
 
 // Component Imports
 import { Login } from "./components/Login.jsx"; // New Import
-import { Dashboard } from "./components/Dashboard.jsx";
+// import { Dashboard } from "./components/Dashboard.jsx";
 import { UserManagement } from "./components/UserManagement.jsx";
 import { ContentManagement } from "./components/ContentManagement.jsx";
 import { FeedbackSupport } from "./components/FeedbackSupport.jsx";
@@ -42,12 +42,7 @@ const Header = () => (
       </Typography>
       
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <IconButton size="small" sx={{ border: '1px solid #e2e8f0' }}><Search size={18} /></IconButton>
-        <IconButton size="small" sx={{ border: '1px solid #e2e8f0' }}>
-          <Badge badgeContent={4} color="error">
-            <Bell size={18} />
-          </Badge>
-        </IconButton>
+        
         
         <Divider orientation="vertical" flexItem sx={{ mx: 1, height: '24px', my: 'auto' }} />
         
@@ -78,10 +73,8 @@ const Header = () => (
 const Sidebar = ({ onSignOut }) => { // Added prop for logout
   const location = useLocation();
   const menuItems = [
-    { text: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
     { text: "User Management", icon: <Users size={20} />, path: "/user-management" },
     { text: "Content Management", icon: <FileText size={20} />, path: "/content-management" },
-   
     { text: "Feedback & Support", icon: <MessageSquare size={20} />, path: "/feedback-support" },
     { text: "Security & Roles", icon: <Lock size={20} />, path: "/security-roles" },
     { text: "Settings", icon: <SettingsIcon size={20} />, path: "/settings" },
@@ -102,15 +95,6 @@ const Sidebar = ({ onSignOut }) => { // Added prop for logout
       }}
     >
       <Box sx={{ p: 3, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <Box sx={{ 
-          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 
-          p: 1, 
-          borderRadius: '12px',
-          display: 'flex',
-          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
-        }}>
-          <Shield size={24} color="white" />
-        </Box>
         <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-1px', color: '#1e293b' }}>
           MINDMATE
         </Typography>
@@ -188,8 +172,8 @@ export default function App() {
           }}
         >
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Navigate to="/user-management" replace />} />
+            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
             <Route path="/user-management" element={<UserManagement onSave={showVerification} />} />
             <Route path="/content-management" element={<ContentManagement />} />
            
