@@ -28,7 +28,7 @@ export function ContentManagement() {
     }
 
     const formData = new FormData();
-    formData.append(type, file); // 🔥 MUST match multer field name
+    formData.append(type, file); // MUST match multer field name
     formData.append("title", title);
     formData.append("description", description);
 

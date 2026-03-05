@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -7,14 +7,14 @@ import {
   Button,
   Stack,
   InputAdornment,
-  Alert,
-  Link
+  Link,
+  Alert
 } from "@mui/material";
-import { Mail, Key } from 'lucide-react';
+import { Mail, Key } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export function Login({ onLogin }) {
+export function Signup() {
 
   const navigate = useNavigate();
 
@@ -23,14 +23,22 @@ export function Login({ onLogin }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
+    setSuccess("");
 
+    // validation
     if (!email || !password) {
       setError("Email and password are required");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
       return;
     }
 
@@ -39,24 +47,28 @@ export function Login({ onLogin }) {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:3000/api/admin/login",
-        { email, password }
+        "http://localhost:3000/api/admin/register",
+        {
+          email: email,
+          password: password
+        }
       );
 
-      // save login state
-      localStorage.setItem("auth", "true");
+      setSuccess(res.data.message || "Admin created successfully");
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      setEmail("");
+      setPassword("");
 
-      onLogin();
+      // redirect to login
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
 
     } catch (err) {
 
       setError(
         err.response?.data?.message ||
-        "Invalid email or password"
+        "Registration failed. Please try again."
       );
 
     } finally {
@@ -65,39 +77,44 @@ export function Login({ onLogin }) {
   };
 
   return (
+
     <Box
       sx={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)"
       }}
     >
       <Paper
-        elevation={0}
         sx={{
           p: 5,
-          width: '100%',
+          width: "100%",
           maxWidth: 420,
-          borderRadius: '24px',
-          border: '1px solid #e2e8f0',
-          textAlign: 'center',
-          boxShadow: '0 20px 25px rgba(0,0,0,0.1)'
+          borderRadius: "24px",
+          border: "1px solid #e2e8f0",
+          textAlign: "center",
+          boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)"
         }}
       >
 
-        <Typography variant="h4" sx={{ fontWeight: 900, mb: 1 }}>
-          MindMate Admin
-        </Typography>
-
-        <Typography variant="body2" sx={{ mb: 4 }}>
-          Health Dashboard Access
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 900, mb: 4 }}
+        >
+          MindMate Admin Signup
         </Typography>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
+          </Alert>
+        )}
+
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
           </Alert>
         )}
 
@@ -107,14 +124,14 @@ export function Login({ onLogin }) {
             <TextField
               label="Admin Email"
               type="email"
-              fullWidth
               required
+              fullWidth
               value={email}
-              onChange={(e)=>setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Mail size={18}/>
+                    <Mail size={18} />
                   </InputAdornment>
                 )
               }}
@@ -123,14 +140,15 @@ export function Login({ onLogin }) {
             <TextField
               label="Password"
               type="password"
-              fullWidth
               required
+              fullWidth
               value={password}
-              onChange={(e)=>setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
+              helperText="Minimum 8 characters"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Key size={18}/>
+                    <Key size={18} />
                   </InputAdornment>
                 )
               }}
@@ -142,24 +160,23 @@ export function Login({ onLogin }) {
               fullWidth
               disabled={loading}
               sx={{
-                py:1.6,
-                borderRadius:'12px',
-                fontWeight:700,
-                textTransform:'none'
+                py: 1.6,
+                borderRadius: "12px",
+                fontWeight: 800,
+                textTransform: "none"
               }}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Creating account..." : "Sign Up"}
             </Button>
 
-            {/* SIGNUP REDIRECT */}
-            <Typography variant="body2" sx={{ textAlign: "center" }}>
-              Don't have an account?{" "}
+            <Typography variant="body2">
+              Already have an account?{" "}
               <Link
                 component="button"
                 underline="hover"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/login")}
               >
-                Sign up
+                Login
               </Link>
             </Typography>
 

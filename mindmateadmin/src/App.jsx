@@ -1,36 +1,29 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
-import { 
-  CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, 
-  ListItemText, Typography, Divider, AppBar, Toolbar, Avatar, IconButton, 
-  Badge, Snackbar, Alert, Stack, Button 
+import {
+  CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon,
+  ListItemText, Typography, Divider, AppBar, Toolbar, Button, Snackbar, Alert, Stack
 } from "@mui/material";
-import { 
-  LayoutDashboard, FileText, BarChart3, MessageSquare, Bell, LogOut, 
-  Shield, Lock, Settings as SettingsIcon, ShieldCheck, Users, Search 
-} from "lucide-react";
+import { LogOut, Users, FileText } from "lucide-react";
 
 // Component Imports
-import { Login } from "./components/Login.jsx"; // New Import
-// import { Dashboard } from "./components/Dashboard.jsx";
+import { Login } from "./components/Login.jsx";
+import { Signup } from "./components/Signup.jsx";
 import { UserManagement } from "./components/UserManagement.jsx";
 import { ContentManagement } from "./components/ContentManagement.jsx";
-import { FeedbackSupport } from "./components/FeedbackSupport.jsx";
-import { SecurityRoles } from "./components/SecurityRoles.jsx";
-import { Settings } from "./components/Settings.jsx";
 
 const drawerWidth = 280;
 
-// --- PERSISTENT HEADER ---
+// --- HEADER ---
 const Header = () => (
-  <AppBar 
-    position="fixed" 
+  <AppBar
+    position="fixed"
     elevation={0}
-    sx={{ 
-      width: `calc(100% - ${drawerWidth}px)`, 
+    sx={{
+      width: `calc(100% - ${drawerWidth}px)`,
       ml: `${drawerWidth}px`,
       bgcolor: 'rgba(255, 255, 255, 0.8)',
-      backdropFilter: 'blur(8px)', // Modern glass effect
+      backdropFilter: 'blur(8px)',
       borderBottom: '1px solid #e2e8f0',
       color: '#0f172a',
       zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -38,46 +31,18 @@ const Header = () => (
   >
     <Toolbar sx={{ justifyContent: 'space-between' }}>
       <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748b', letterSpacing: '0.5px' }}>
-        MINDMATE ADMIN 
+        MINDMATE ADMIN
       </Typography>
-      
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        
-        
-        <Divider orientation="vertical" flexItem sx={{ mx: 1, height: '24px', my: 'auto' }} />
-        
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1 }}>Admin User</Typography>
-            <Typography variant="caption" sx={{ color: '#3b82f6', fontWeight: 600 }}>Super Admin</Typography>
-          </Box>
-          <Avatar 
-            sx={{ 
-              bgcolor: '#3b82f6', 
-              fontWeight: 800, 
-              width: 36, 
-              height: 36,
-              fontSize: '0.9rem',
-              boxShadow: '0 2px 8px rgba(59, 130, 246, 0.4)'
-            }}
-          >
-            AD
-          </Avatar>
-        </Stack>
-      </Box>
     </Toolbar>
   </AppBar>
 );
 
-// --- PERSISTENT SIDEBAR ---
-const Sidebar = ({ onSignOut }) => { // Added prop for logout
+// --- SIDEBAR ---
+const Sidebar = ({ onSignOut }) => {
   const location = useLocation();
   const menuItems = [
     { text: "User Management", icon: <Users size={20} />, path: "/user-management" },
     { text: "Content Management", icon: <FileText size={20} />, path: "/content-management" },
-    { text: "Feedback & Support", icon: <MessageSquare size={20} />, path: "/feedback-support" },
-    { text: "Security & Roles", icon: <Lock size={20} />, path: "/security-roles" },
-    { text: "Settings", icon: <SettingsIcon size={20} />, path: "/settings" },
   ];
 
   return (
@@ -86,15 +51,15 @@ const Sidebar = ({ onSignOut }) => { // Added prop for logout
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        '& .MuiDrawer-paper': { 
-          width: drawerWidth, 
-          boxSizing: 'border-box', 
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          boxSizing: 'border-box',
           borderRight: '1px solid #e2e8f0',
-          background: '#ffffff' 
+          background: '#ffffff'
         },
       }}
     >
-      <Box sx={{ p: 3, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box sx={{ p: 3, mb: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-1px', color: '#1e293b' }}>
           MINDMATE
         </Typography>
@@ -105,9 +70,9 @@ const Sidebar = ({ onSignOut }) => { // Added prop for logout
           const active = location.pathname === item.path;
           return (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton 
+              <ListItemButton
                 component={Link} to={item.path}
-                sx={{ 
+                sx={{
                   borderRadius: '12px',
                   bgcolor: active ? '#eff6ff' : 'transparent',
                   color: active ? '#3b82f6' : '#64748b',
@@ -125,12 +90,12 @@ const Sidebar = ({ onSignOut }) => { // Added prop for logout
 
       <Box sx={{ p: 2 }}>
         <Divider sx={{ mb: 2 }} />
-        <Button 
-          fullWidth 
-          variant="text" 
-          color="error" 
-          onClick={onSignOut} // Trigger logout logic
-          startIcon={<LogOut size={18}/>} 
+        <Button
+          fullWidth
+          variant="text"
+          color="error"
+          onClick={onSignOut}
+          startIcon={<LogOut size={18} />}
           sx={{ borderRadius: '12px', fontWeight: 700, justifyContent: 'flex-start', px: 2 }}
         >
           Sign Out
@@ -140,62 +105,86 @@ const Sidebar = ({ onSignOut }) => { // Added prop for logout
   );
 };
 
+// --- PROTECTED ROUTE ---
+const ProtectedRoute = ({ isAuthenticated, children }) => {
+  return isAuthenticated ? children : <Navigate to="/signup" replace />;
+};
+
 // --- MAIN APP ---
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
+  // Pure React state; resets on reload
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [notify, setNotify] = useState({ open: false, message: '', severity: 'success' });
 
-  const showVerification = (msg) => {
-    setNotify({ open: true, message: msg, severity: 'success' });
+  const showNotification = (msg, severity = 'success') => {
+    setNotify({ open: true, message: msg, severity });
   };
-
-  // If not logged in, show the Login screen exclusively
-  if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
-  }
 
   return (
     <Router>
       <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
         <CssBaseline />
-        <Header />
-        <Sidebar onSignOut={() => setIsAuthenticated(false)} />
-        
-        <Box 
-          component="main" 
-          sx={{ 
-            flexGrow: 1, 
-            p: 4, 
-            mt: 9, 
-            width: `calc(100% - ${drawerWidth}px)`,
-            minHeight: '100vh'
+        {isAuthenticated && <Header />}
+        {isAuthenticated && <Sidebar onSignOut={() => setIsAuthenticated(false)} />}
+
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 4,
+            mt: 9,
+            width: isAuthenticated ? `calc(100% - ${drawerWidth}px)` : "100%", minHeight: '100vh'
           }}
         >
           <Routes>
-            <Route path="/" element={<Navigate to="/user-management" replace />} />
-            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-            <Route path="/user-management" element={<UserManagement onSave={showVerification} />} />
-            <Route path="/content-management" element={<ContentManagement />} />
-           
-           
-            <Route path="/feedback-support" element={<FeedbackSupport />} />
-           
-            <Route path="/security-roles" element={<SecurityRoles />} />
-            <Route path="/settings" element={<Settings onSave={showVerification} />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+            {/* Public Routes */}
+            <Route
+              path="/login"
+              element={isAuthenticated ? <Navigate to="/user-management" replace /> : <Login onLogin={() => setIsAuthenticated(true)} />}
+            />
+            <Route
+              path="/signup"
+              element={isAuthenticated ? <Navigate to="/user-management" replace /> : <Signup />}
+            />
+            <Route
+              path="/"
+              element={<Navigate to="/signup" replace />}
+            />
+
+            {/* Protected Routes */}
+            <Route
+              path="/user-management"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <UserManagement onSave={(msg) => showNotification(msg)} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/content-management"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <ContentManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/signup" replace />} />
           </Routes>
         </Box>
 
-        <Snackbar 
-          open={notify.open} 
-          autoHideDuration={4000} 
+        <Snackbar
+          open={notify.open}
+          autoHideDuration={4000}
           onClose={() => setNotify({ ...notify, open: false })}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-          <Alert 
+          <Alert
             onClose={() => setNotify({ ...notify, open: false })}
-            severity={notify.severity} 
-            variant="filled" 
+            severity={notify.severity}
+            variant="filled"
             sx={{ width: '100%', borderRadius: '12px', fontWeight: 600, boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
           >
             {notify.message}
